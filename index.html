@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Погодный сервис</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2B6CB0;
+            --secondary: #4299E1;
+            --background: #F7FAFC;
+            --text: #2D3748;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+            background-color: var(--background);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .search-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 1rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #E2E8F0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: var(--secondary);
+        }
+
+        button {
+            padding: 1rem 2rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        button:hover {
+            background: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        .weather-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .weather-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .weather-icon {
+            font-size: 3rem;
+            color: var(--secondary);
+        }
+
+        .weather-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background: var(--background);
+            border-radius: 0.5rem;
+        }
+
+        .stat-item i {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .history-section {
+            margin-top: 3rem;
+        }
+
+        .history-item {
+            background: white;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: transform 0.2s;
+        }
+
+        .history-item:hover {
+            transform: translateX(5px);
+        }
+
+        .error {
+            background: #FED7D7;
+            color: #C53030;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+            border-left: 4px solid #C53030;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 640px) {
+            .search-form {
+                flex-direction: column;
+            }
+            
+            button {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1><i class="fas fa-cloud-sun"></i> Погодный сервис</h1>
+    </div>
+
+    <div class="search-box">
+        <form class="search-form" method="POST">
+            <input type="text" name="city" placeholder="Введите город...">
+            <button type="submit">
+                <i class="fas fa-search"></i>
+                <span>Найти</span>
+            </button>
+        </form>
+    </div>
+
+    {% if error %}
+        <div class="error">{{ error }}</div>
+    {% endif %}
+
+    {% if weather %}
+    <div class="weather-card">
+        <div class="weather-header">
+            <div>
+                <h2>{{ weather.city }}</h2>
+                <p class="timestamp">{{ weather.time }}</p>
+            </div>
+            <i class="fas fa-{{ 'sun' if 'ясно' in weather.description else 'cloud' if 'облачно' in weather.description else 'cloud-rain' }} weather-icon"></i>
+        </div>
+        
+        <div class="weather-stats">
+            <div class="stat-item">
+                <i class="fas fa-thermometer-half"></i>
+                <h3>{{ weather.temp }}°C</h3>
+                <p>Температура</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-tint"></i>
+                <h3>{{ weather.humidity }}%</h3>
+                <p>Влажность</p>
+            </div>
+            <div class="stat-item">
+                <i class="fas fa-wind"></i>
+                <h3>{{ weather.wind_speed }} м/с</h3>
+                <p>Скорость ветра</p>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="history-section">
+        <h2><i class="fas fa-history"></i> История запросов</h2>
+        {% for entry in history %}
+        <div class="history-item">
+            <div>
+                <h3>{{ entry.city }}</h3>
+                <small>{{ entry.time }}</small>
+            </div>
+            <div style="display: flex; gap: 1.5rem;">
+                <div>
+                    <small>Температура</small>
+                    <div>{{ entry.temp }}°C</div>
+                </div>
+                <div>
+                    <small>Влажность</small>
+                    <div>{{ entry.humidity }}%</div>
+                </div>
+                <div>
+                    <small>Ветер</small>
+                    <div>{{ entry.wind_speed }} м/с</div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <p style="text-align: center; color: #718096;">История запросов пуста</p>
+        {% endfor %}
+    </div>
+</body>
+</html>
